@@ -1,0 +1,13 @@
+{
+    "autoload": {
+    	"classmap": [
+    		"src/"
+    	]
+    },
+    "require": {
+        "google/cloud-vision": "v0.10.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6"
+    }
+}
