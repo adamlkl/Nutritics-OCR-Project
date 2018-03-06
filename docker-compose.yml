@@ -1,0 +1,19 @@
+version: "2"
+services:
+  app:
+    image: php:7
+    command: php -S 0.0.0.0:8000 /app/src/index.php
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - ${GOOGLE_APPLICATION_CREDENTIALS}:/secrets/app_credentials.json
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/app_credentials.json
+      - GOOGLE_PROJECT_ID=${GOOGLE_PROJECT_ID}
+
+  composer:
+    image: composer/composer:php7
+    command: install
+    volumes:
+      - .:/app

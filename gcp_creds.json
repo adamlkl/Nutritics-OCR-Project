@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "glass-arcana-196422",
+  "private_key_id": "4c6a658d77a1c835d034616bfeb1c5148aa34084",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCt+prOhJEYD++z\nWl4dewJSHpiVe96Hql5OYtHou0Fj+Op2XAQgXVCnIBwF+Iud7epCcMNpubkA2sfp\nCeQHpAW6IT95W+apX6G4sGe/+0zD+u9W2XgJLh182On6XuBgcq5z1cJi3g7PObI6\ngITvlJpDkoDQ1CTZGGBhJCZWdn8WG8Y9APyGQVFC0RCvljtfQb0OhzYkGW83be6c\nsrP7gkhyieioNECTWvjt8gZNsl+kj9+jvHTZti0Wwktsfh5WiIFnS6+qySbCFg4q\n6vRS569fRGQVLFFPdgdm9f4gTIYmMdFDgNb1AFV5YRhi1cCytnWdP+doDlkUoUNK\n7q3y7cIHAgMBAAECggEAA2asmRCZX4g244wxiSUAS3JYAZrCzmcjtyeSZUN9M0Lz\nSRi3vJmRETtSS5brb80YsRolj88MJqVK7Ct/1DBo1kB+eP+1bNE28aEtM2EVGUMH\nY8IWPnkIJYp+BHbPWcNUKrqJNXKUL96NCpIRnIy3TqPctc234gXqeGutqNoMgPZG\nG3fZUt0MqP/VarzqCbhlaE2PpoKfunULFHc7xzytSvffM+pIhqMKLuBrccc8oBw5\nmn0DouWjLrG0Y5eSD/ZlRvpzq9lBd/kYPPviKJkqCv5dHb4q5qfS+LwXQxds+A05\n1QgiNuYysQsEZoUHpMJxwYsSV7oSSu/Hq3xfbfYXeQKBgQDeSLI9f/lOEEXcUXOd\nntJw0F5p40mrtYwjADQZCxTulbO/LExrrHOVL+nmKZjLw9O0tkxZ7FVbw/QaQp9K\n4Hk5lW7LKZusBHExFAK3s1MBR8sToObR6c1ctLe+Fl17GRbk453pR5uN7BmIbH3F\nO/gSKfk8vWnKyOAhSFbhm0a0aQKBgQDIXjhGZFqw1FS0Ta8ZgxIOqLw0xuax8MKM\nu8UgH6jkCn7OtZbROKZI8zq3GN+3YEgyguDPlJIwq5SYNdWR+x0Nqic6bs8aHc9z\nAPgxmo3bpuUpIqfhE6e+AA9LKKsPSQL36ZnhDIZDn7iSFhhoVw4UUyxQQYW/Jlc1\nRdK6ZFY07wKBgQCcuaTyt8iPwel/7e4WtGSsJj5ralYHO3oTM5GIFsgrcGHL6O/4\n+x6DkcTZA3s4MFqUj/RFcty8Vu1FlrO5l4vhjfsQQ8X/AyLL98/ytf1Qac5FiK02\nVCL3unPTEvHWWVpLCDHOyS5kYpOeHOCQsDe4lt+kc+ijkf51eQvJBjJUAQKBgAtK\na+djjky6mk9StVQ9s43J6lkbADL0uzHM/u2xewXmpYCmcOo3Q/+GXT+mEi02KrtV\n7q8j0x0U/hmZpwBD4z464V0Ek30IQwFbA6Ff8TB4dh9cSZOAVQp63GHC1+jTl2w6\n6KXq28IBxRfOUO/IQA3bJfsbxhqgYXeqCJbiQo1XAoGADCI0KktIWleGr+y7FhmI\nIrqSzuL5q4xHAWOascLCqiTSmGC+F/l/e5CPb8Xv2HT86iPuBOP9oIYEbI3WoU8i\nYsQ0E7AkxZKZ+EQtNUk0OwGG3toGPQi5bKoExzKNOpQQSi1ANEy8F1XgLginF5k3\nZsRJ50oHpSHn9CXqe6wKxJk=\n-----END PRIVATE KEY-----\n",
+  "client_email": "nutritics@glass-arcana-196422.iam.gserviceaccount.com",
+  "client_id": "116872722399919101664",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/nutritics%40glass-arcana-196422.iam.gserviceaccount.com"
+}
