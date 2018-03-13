@@ -13,14 +13,14 @@ header('Content-type: application/json');
 
 $json_response = getOCRResponseJSON(fopen('/app/tests/testdata/images/noodles.jpg', 'r'));
 
-print_r($json_response);
+//print_r($json_response);
 
 
 
 
 $response = json_decode($json_response);
 
-//filterJSONresponse($response);
+filterJSONresponse($response);
 
 /*
 $key = array_search('Fat', $response);
