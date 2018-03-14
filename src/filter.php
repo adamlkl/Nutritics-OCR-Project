@@ -12,6 +12,7 @@ get average y value of corners (middle of box)
 use to find an intersection with x from 100g column
 add intersection as a search point for that nutriotional value
 */
+
 /*
 datastructures needed:
 array of 7 nutritional headings (fat, energy etc)
@@ -20,7 +21,8 @@ blank json response to fill with answer
 */
 
 /*
-try hard coding values then calculating
+All nutrient names are case sensitive in the JSONResponse
+TODO; Add functionality to determine whether we need to find "100g" or any permuation of it
 */
 
 function filterJSONresponse($response)
@@ -31,8 +33,39 @@ function filterJSONresponse($response)
 	$xColumn = getMedianX($gram100Box);
 	//echo($xColumn);
 	$fatBox = findObject("Fat", $response);
-	//echo($fatBox->boundingPoly->vertices[1]->x);
 	$yRow = getMedianY($fatBox);
+	$nutrient = "Fat ";
+	echoResult($response,$xColumn, $yRow, $nutrient);
+	
+	$saturatesBox = findObject("saturates", $response);
+	$nutrient = "Of which saturates ";
+	$yRow = getMedianY($saturatesBox);
+	echoResult($response,$xColumn, $yRow, $nutrient);
+	
+	$carbBox = findObject("Carbohydrate", $response);
+	$yRow = getMedianY($carbBox);
+	$nutrient = "Carbohydarates ";
+	echoResult($response,$xColumn, $yRow, $nutrient);
+	
+	$sugarsBox = findObject("sugars", $response);
+	$nutrient = "Of which sugars ";
+	$yRow = getMedianY($sugarsBox);
+	echoResult($response,$xColumn, $yRow, $nutrient);
+	
+	$fibreBox = findObject("Fibre", $response);
+	$yRow = getMedianY($fibreBox);
+	$nutrient = "Fibre ";
+	echoResult($response,$xColumn, $yRow, $nutrient);
+	
+	$proteinBox = findObject("Protein", $response);
+	$yRow = getMedianY($proteinBox);
+	$nutrient = "Protein ";
+	echoResult($response,$xColumn, $yRow, $nutrient);
+	
+	$saltBox = findObject("Salt", $response);
+	$yRow = getMedianY($saltBox);
+	$nutrient = "Salt ";
+	echoResult($response,$xColumn, $yRow, $nutrient);
 	
 	
 	// $verticeIntersection = vertice{
@@ -40,14 +73,22 @@ function filterJSONresponse($response)
 	// 	y: $yColumn
 	// };
 	
+}
+
+// Echo result of collides to console
+// TODO; add results into an array or JSON then print
+
+function echoResult($response, $xColumn, $yRow, $nutirent)	
+{
 	foreach ($response->textAnnotations as $box) 
 	{
 		if ($box != $response->textAnnotations[0])
 		{
 		if(collides($box, $xColumn, $yRow))
 		{
-			
+			echo($nutirent);
 			echo($box->description);
+			echo("\n");
 		}
 		}
 	}
@@ -71,6 +112,8 @@ function collides($box, $xVal, $yVal)
 						return true;
 }
 */
+
+
 
 function collides($box, $xVal, $yVal)
 {
@@ -107,6 +150,8 @@ function getMedianX($object)
 	}
 	return $xRunningTotal/4;
 }
+
+
 	
 function getMedianY($object)
 {
@@ -121,6 +166,9 @@ function getMedianY($object)
 	}
 	return $yRunningTotal/4;
 }	
+
+
+
 		
 function findObject($string, $response)
 {
