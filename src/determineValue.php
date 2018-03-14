@@ -5,15 +5,22 @@ description: checks if a string passed in is a mass
 returns: true if yes; false if no
 */
 function determineValue ($var){
-		
+		//if var is not a string, change it to string
+		if (strcmp(gettype($var),"string")!==0)
+		{
+			if (strcmp(gettype($var),"boolean")===0)
+			{
+				return false;
+			}
+			else settype($var, "string");
+		}
 		//check if the string has the measuring unit of mg
 		if (strpos($var, "mg")){
 			//check if the substring only exist once in the string
 			//then check the index of the string if it is located at the end 
 			//try removeing the last two character and check if there are only numbers in it
-			var_dump("test");
 			return 	strpos($var,"mg")==strrpos($var,"mg") && 
-				   	strpos($var,"mg")==strlen($var)-2 && 
+				   	strpos($var,"mg")==mb_strlen($var)-2 && 
 					is_numeric(substr($var, 0, -2));
 		}
 
@@ -22,9 +29,8 @@ function determineValue ($var){
 			//check if the substring only exist once in the string
 			//then check the index of the string if it is located at the end 
 			//try removing the last two character and check if there are only numbers in it
-			//var_dump("test2");
 			return strpos($var,"μg")==strrpos($var,"μg") && 
-				   strpos($var,"μg")==strlen($var)-3 && 
+				   strpos($var,"μg")==mb_strlen($var)-2 && 
 				   is_numeric(substr($var,0,-3));
 		}
 
@@ -50,6 +56,10 @@ var_dump(determineValue("10.5g")); 		// bool(true)
 var_dump(determineValue("1.5yg")); 		// bool(false)
 var_dump(determineValue("g1.5yg")); 	// bool(false)
 var_dump(determineValue("3.4fjj")); 	// bool(false)
+var_dump(determineValue(1));			// bool(true)
+var_dump(determineValue(1.455));		// bool(true)
+var_dump(determineValue(14690));		// bool(true)
+var_dump(determineValue(true));			// bool(false)
 
 $foo = "5bar"; // string
 settype($foo, "float");
