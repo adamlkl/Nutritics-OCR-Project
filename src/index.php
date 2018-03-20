@@ -20,7 +20,9 @@ $json_response = getOCRResponseJSON(fopen('/app/tests/testdata/images/noodles.jp
 
 $response = json_decode($json_response);
 
-filterJSONresponse($response);
+$final = filterJSONresponse($response);
+
+print_r($final);
 
 /*
 $key = array_search('Fat', $response);
@@ -35,17 +37,17 @@ echo($key);
 foreach($response->textAnnotations as $text)
 {
 	//echo($text->description);
-	
+
 	if ($text->description == "Fat")
 	{
 	echo($text->description);
-	
+
 	}
 
 }
 
 */
-//$result = array_filter($response['description'], function($fat)) 
+//$result = array_filter($response['description'], function($fat))
 //{
 
 
@@ -55,14 +57,14 @@ foreach($response->textAnnotations as $text)
 /*
 foreach($response['responses'][0]['textAnnotations'] as $box)
 {
-	
+
 				$points = array();
 
 				foreach($box['boundingPoly']['vertices'] as $vertex)
 				{
 					array_push($points, $vertex['x'], $vertex['y']);
 				}
-				
+
 				imagepolygon($im, $points, count($box['boundingPoly']['vertices']), $red);
 
 }
