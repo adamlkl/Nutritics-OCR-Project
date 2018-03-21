@@ -47,6 +47,38 @@ function determineValue ($var){
 		}
 	}
 
+/*
+check similarity of two strings 
+correcting typo error 
+parameters: string name of nutrient 
+returns: string corrected version of name
+		 "INVALID" if cant correct typo error	
+*/
+function checkSimilarity ($nutrient){
+	//list of nutrients
+	$nutrientList = array("Energy","Protein","Fat","Carbohydrate","Sugars","Sodium","Vitamin E","Vitamin K","Vitamin C", "Vitamin A","Vitamin D","Vitamin B6","Biotin","Thiamin","Riboflavin","Niacin","Folic Acid","Vitamin B12","Calcium","Iron","Zinc","Pantothenic Acid","Folate","Phosphorus","Iodine","Magnesium","Selenium","Copper","Manganese","Chromium","Molybdenum","Chloride");
+	$test=str_replace(' ', '', $nutrient);
+	for ($x=0;$x<count($nutrientList);$x++)
+	{
+		$test2=str_replace(' ', '', $nutrientList[$x]);
+		//$sim = similar_text(strtolower($nutrient), strtolower($nutrientList[$x]), $perc);
+		$sim = similar_text(strtolower($test), strtolower($test2), $perc);
+		if ($perc>70 && abs(strlen($test)-strlen($test2)<2))
+		{
+			//if (strcmp(substr(strtolower($nutrient,0,7))),"vitamin")===0){
+			//check if it is a vitamin
+			if (strcmp(substr(strtolower($test2),0,7),"vitamin")===0){
+				if ($perc>90) return $nutrientList[$x];
+				else continue;
+			}
+			//else return strtoupper(substr($nutrient,0,1)).strtolower(substr($nutrient,1));
+			else return $nutrientList[$x];
+		}
+	}
+	return "INVALID";
+}
+
+/*
 //test results
 var_dump(determineValue("10"));     	// bool(true)
 var_dump(determineValue("10.334"));   	// bool(true)
@@ -64,4 +96,11 @@ var_dump(determineValue(true));			// bool(false)
 $foo = "5bar"; // string
 settype($foo, "float");
 var_dump($foo);  // $bar is now "1" (string))
+*/
+var_dump(checkSimilarity("f ats"));
+var_dump(checkSimilarity("fats"));
+var_dump(checkSimilarity("Molyadeuum"));
+var_dump(checkSimilarity("codiwhfiwhe"));
+var_dump(checkSimilarity("Vitamin K"));
+var_dump(checkSimilarity("Vitamin Z"));
 ?>
