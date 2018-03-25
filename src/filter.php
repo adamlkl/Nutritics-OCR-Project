@@ -26,56 +26,64 @@ blank json response to fill with answer
 All nutrient names are case sensitive in the JSONResponse
 TODO; Add functionality to determine whether we need to find "100g" or any permuation of it
 */
+require_once (__DIR__ . '/determineValue.php');
 
 function filterJSONresponse($response)
 {
 	$jsonReturn = new stdClass();
 	$gram100Box = findObject("100g**", $response);
-	//echo($gram100Box->description);
 
 	$xColumn = getMedianX($gram100Box);
-	//echo($xColumn);
 	$fatBox = findObject("Fat", $response);
 	$yRow = getMedianY($fatBox);
 	$nutrient = "Fat ";
-	$jsonReturn->Fat = getResult($response,$xColumn, $yRow, $nutrient);
+	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
+		$jsonReturn->Fat = getResult($response,$xColumn, $yRow, $nutrient);
+	}
 
 	$saturatesBox = findObject("saturates", $response);
 	$nutrient = "Of which saturates ";
 	$yRow = getMedianY($saturatesBox);
-	$jsonReturn->Saturates = getResult($response,$xColumn, $yRow, $nutrient);
+	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
+		$jsonReturn->Saturates = getResult($response,$xColumn, $yRow, $nutrient);
+	}
 
 	$carbBox = findObject("Carbohydrate", $response);
 	$yRow = getMedianY($carbBox);
 	$nutrient = "Carbohydrates ";
-	$jsonReturn->Carbohydrates = getResult($response,$xColumn, $yRow, $nutrient);
+	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
+		$jsonReturn->Carbohydrates = getResult($response,$xColumn, $yRow, $nutrient);
+	}
 
 	$sugarsBox = findObject("sugars", $response);
 	$nutrient = "Of which sugars ";
 	$yRow = getMedianY($sugarsBox);
-	$jsonReturn->Sugars = getResult($response,$xColumn, $yRow, $nutrient);
+	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){	
+		$jsonReturn->Sugars = getResult($response,$xColumn, $yRow, $nutrient);
+	}
 
 	$fibreBox = findObject("Fibre", $response);
 	$yRow = getMedianY($fibreBox);
 	$nutrient = "Fibre ";
-	$jsonReturn->Fibre = getResult($response,$xColumn, $yRow, $nutrient);
+	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
+		$jsonReturn->Fibre = getResult($response,$xColumn, $yRow, $nutrient);
+	}
 
 	$proteinBox = findObject("Protein", $response);
 	$yRow = getMedianY($proteinBox);
 	$nutrient = "Protein ";
-	$jsonReturn->Protein = getResult($response,$xColumn, $yRow, $nutrient);
+	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
+		$jsonReturn->Protein = getResult($response,$xColumn, $yRow, $nutrient);
+	}	
 
 	$saltBox = findObject("Salt", $response);
 	$yRow = getMedianY($saltBox);
 	$nutrient = "Salt ";
-	$jsonReturn->Salt = getResult($response,$xColumn, $yRow, $nutrient);
+	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
+		$jsonReturn->Salt = getResult($response,$xColumn, $yRow, $nutrient);
+	}
 
 	return json_encode($jsonReturn);
-	// $verticeIntersection = vertice{
-	// 	x: $xColumn,
-	// 	y: $yColumn
-	// };
-
 }
 
 // Echo result of collides to console
@@ -100,27 +108,8 @@ function getResult($response, $xColumn, $yRow, $nutirent)
 
 }
 
-/*
-
 function collides($box, $xVal, $yVal)
 {
-	if (!(($xVal < min($box->boundingPoly->vertices[0]->x, $box->boundingPoly->vertices[4]->x)
-						|| $xVal > max($box->boundingPoly->vertices[1]->x, $box->boundingPoly->vertices[2]->x)
-						|| $yVal < min($box->boundingPoly->vertices[0]->y, $box->boundingPoly->vertices[1]->y)
-						|| $yVal > max($box->boundingPoly->vertices[3]->y, $box->boundingPoly->vertices[2]->y)
-						)))
-						{
-							return false;
-						}
-						return true;
-}
-*/
-
-
-
-function collides($box, $xVal, $yVal)
-{
-
 	$verts = $box->boundingPoly->vertices;
 
 	if ($xVal > min($verts[0]->x, $verts[3]->x) && $xVal < max($verts[1]->x, $verts[2]->x) &&
@@ -131,9 +120,6 @@ function collides($box, $xVal, $yVal)
 
 		}
 		return false;
-
-
-
 }
 
 function getMedianX($object)
@@ -177,18 +163,11 @@ function findObject($string, $response)
 {
 	foreach($response->textAnnotations as $text)
 	{
-		if ($text->description == $string)
+		if ($text->description == $string || checkSimilarity($text->description)==$string)
 		{
 			return $text;
 		}
 	}
 }
-
-
-
-
-
-
-
 
 ?>
