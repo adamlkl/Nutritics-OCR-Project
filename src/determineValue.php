@@ -91,10 +91,12 @@ $foo = "5bar"; // string
 settype($foo, "float");
 var_dump($foo);  // $bar is now "1" (string))
 */
+/*
 var_dump(checkSimilarity("f ats"));
 var_dump(checkSimilarity("fats"));
 var_dump(checkSimilarity("Molyadeuum"));
 var_dump(checkSimilarity("codiwhfiwhe"));
 var_dump(checkSimilarity("Vitamin K"));
 var_dump(checkSimilarity("Vitamin Z"));
+*/
 ?>
