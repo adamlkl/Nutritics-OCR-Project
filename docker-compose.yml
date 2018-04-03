@@ -8,6 +8,7 @@ services:
     volumes:
       - .:/app
       - ${GOOGLE_APPLICATION_CREDENTIALS}:/secrets/app_credentials.json
+      - ./config/php.ini:/usr/local/etc/php/php.ini
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/secrets/app_credentials.json
       - GOOGLE_PROJECT_ID=${GOOGLE_PROJECT_ID}
