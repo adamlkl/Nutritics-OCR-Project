@@ -9,15 +9,7 @@ require_once(__DIR__ . '/filter.php');
 
 header('Content-type: application/json');
 
-//print_r(getOCRResponseJSON(fopen('/app/tests/testdata/images/noodles.jpg', 'r')));
-
-$json_response = getOCRResponseJSON(fopen('/app/tests/testdata/images/noodles.jpg', 'r'));
-
-//print_r($json_response);
-
-
-
-
+$json_response = getOCRResponseJSON(fopen('/app/tests/testdata/images/pistachio.jpg', 'r'));
 $response = json_decode($json_response);
 
 $final = filterJSONresponse($response);

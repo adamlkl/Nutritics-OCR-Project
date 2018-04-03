@@ -23,7 +23,6 @@ function determineValue ($var){
 				   	strpos($var,"mg")==mb_strlen($var)-2 && 
 					is_numeric(substr($var, 0, -2));
 		}
-
 		//check if the string has the measuring unit of μg
 		else if ( strpos($var,"μg")){
 			//check if the substring only exist once in the string
@@ -33,20 +32,17 @@ function determineValue ($var){
 				   strpos($var,"μg")==mb_strlen($var)-2 && 
 				   is_numeric(substr($var,0,-3));
 		}
-
 		//check if the string has the measuring unit of g
 		else if (strpos($var,"g")!==false){
 			//check if the substring only exist once in the string
 			//then check the index of the string 
 			return strpos($var,"g") && strrpos($var,"g") && (strpos($var,"g")==strlen($var)-1) && is_numeric(substr($var, 0, -1));
 		}
-
 		//if the string does not contain any measuring unit, then we try converting it into integer/float
 		else {
 			return is_numeric($var)&&(is_float(floatval($var))||is_integer(intval($var)));
 		}
 	}
-
 /*
 check similarity of two strings 
 correcting typo error 
@@ -77,7 +73,6 @@ function checkSimilarity ($nutrient){
 	}
 	return "INVALID";
 }
-
 /*
 //test results
 var_dump(determineValue("10"));     	// bool(true)
@@ -92,7 +87,6 @@ var_dump(determineValue(1));			// bool(true)
 var_dump(determineValue(1.455));		// bool(true)
 var_dump(determineValue(14690));		// bool(true)
 var_dump(determineValue(true));			// bool(false)
-
 $foo = "5bar"; // string
 settype($foo, "float");
 var_dump($foo);  // $bar is now "1" (string))
