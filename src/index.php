@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <?php
 //require 'vendor/autoload.php';
 // # Includes the autoloader for libraries installed with composer
@@ -21,6 +22,8 @@ print_r($final);
 
 ?>
 =======
+=======
+>>>>>>> 88dc67b9cb3a3bab88459cef8bc052ba20eebdc5
 <!DOCTYPE html>
 <html>
 <head>
@@ -45,7 +48,11 @@ print_r($final);
 	<div class="grid">
 		<div>
             <?php require_once(__DIR__ . '/NutriticsOCR.php'); ?>
+<<<<<<< HEAD
             <?php $result = new NutriticsOCR($POST)->getResult(); ?>
+=======
+            <?php $result = (new NutriticsOCR($POST))->getResult(); ?>
+>>>>>>> 88dc67b9cb3a3bab88459cef8bc052ba20eebdc5
 			<form method="POST" enctype="multipart/form-data" name="uploadForm">
     		<input type="file" name="file">
     		<button type="submit" name="submit" style="font-size: 12px; font-family: cambria; height: 18px; width:70px;">UPLOAD</button></div>
@@ -53,5 +60,9 @@ print_r($final);
 	</div>
 </form>
 </body>
+<<<<<<< HEAD
 </html>
 >>>>>>> dd30d7be27a91460fea5e4efbb9e186d1f2432b7
+=======
+</html>
+>>>>>>> 88dc67b9cb3a3bab88459cef8bc052ba20eebdc5
