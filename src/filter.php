@@ -30,7 +30,7 @@ TODO; Add functionality to determine whether we need to find "100g" or any permu
 */
 require_once (__DIR__ . '/determineValue.php');
 
-require_once (__DIR__ . '/determineValue.php');
+
 
 function filterJSONresponse($response)
 {
@@ -39,10 +39,242 @@ function filterJSONresponse($response)
 	$finalJSON->algo2 = secondSearch($response);
 	$finalJSON->algo3 = thirdSearch($response);
 	
-	return json_encode($finalJSON);
-	//thirdSearch($response);
-	
+	return json_encode($finalJSON);	
 }
+
+/*
+	First Method
+	
+	
+	
+	Param: OCRResponse
+	Returns: JSONOutput
+	Additional Functions Used: findObject(), getMedianX(), getMedianY(), getResult()
+*/
+function firstSearch($response)
+{
+	$jsonReturn = new stdClass();
+	$gram100Box = findObject("100g", $response);
+	if ($gram100box == NULL)
+	{	
+		$gram100box = findObject("100ml", $response);
+	}
+	$xColumn = getMedianX($gram100Box);
+
+	
+	$energyBox = findObject("ENERGY", $response);
+	$yRow = getMedianY($energyBox);
+	$nutrient = "ENERGY ";
+	$jsonReturn->Energy= getResult($response,$xColumn, $yRow, $nutrient);
+	
+		
+	$fatBox = findObject("FAT", $response);
+
+	$yRow = getMedianY($fatBox);
+	$nutrient = "Fat ";
+	$jsonReturn->Fat= getResult($response,$xColumn, $yRow, $nutrient);
+	
+	$saturatesBox = findObject("saturates", $response);
+	$nutrient = "Of which saturates ";
+	$yRow = getMedianY($saturatesBox);
+	$jsonReturn->Saturates = getResult($response,$xColumn, $yRow, $nutrient);
+	
+	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient)))
+	{
+		$jsonReturn->Saturates = getResult($response,$xColumn, $yRow, $nutrient);
+	}
+	
+	
+	$carbBox = findObject("CARBOHYDRATE", $response);
+	if ($carbBox == NULL)
+	{	
+		$carbBox = findObject("Carbohydrate", $response);
+	}
+	$yRow = getMedianY($carbBox);
+	$nutrient = "Carbohydarates ";
+	$jsonReturn->Carbohydrates = getResult($response,$xColumn, $yRow, $nutrient);
+	
+
+	$fatBox = findObject("Fat", $response);
+	$yRow = getMedianY($fatBox);
+	$nutrient = "Fat ";
+	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
+		$jsonReturn->Fat = getResult($response,$xColumn, $yRow, $nutrient);
+	}
+
+	$saturatesBox = findObject("saturates", $response);
+	$nutrient = "Of which saturates ";
+	$yRow = getMedianY($saturatesBox);
+	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
+		$jsonReturn->Saturates = getResult($response,$xColumn, $yRow, $nutrient);
+	}
+
+	$carbBox = findObject("Carbohydrate", $response);
+	$yRow = getMedianY($carbBox);
+	$nutrient = "Carbohydrates ";
+	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
+		$jsonReturn->Carbohydrates = getResult($response,$xColumn, $yRow, $nutrient);
+	}
+
+	$sugarsBox = findObject("sugars", $response);
+	$nutrient = "Of which sugars ";
+	$yRow = getMedianY($sugarsBox);
+	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){	
+		$jsonReturn->Sugars = getResult($response,$xColumn, $yRow, $nutrient);
+	}
+
+	
+	$fibreBox = findObject("Fibre", $response);
+	if ($fibreBox == NULL)
+	{	
+		$fibreBox = findObject("FIBRE", $response);
+	}
+	$yRow = getMedianY($fibreBox);
+	$nutrient = "Fibre ";
+
+	$jsonReturn->Fibre = getResult($response,$xColumn, $yRow, $nutrient);
+	
+
+	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
+		$jsonReturn->Fibre = getResult($response,$xColumn, $yRow, $nutrient);
+	}
+
+
+	$proteinBox = findObject("Protein", $response);
+	if ($proteinBox == NULL)
+	{	
+		$gram100box = findObject("PROTEIN", $response);
+	}
+	$yRow = getMedianY($proteinBox);
+	$nutrient = "Protein ";
+
+	$jsonReturn->Protein = getResult($response,$xColumn, $yRow, $nutrient);
+	
+
+	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
+		$jsonReturn->Protein = getResult($response,$xColumn, $yRow, $nutrient);
+	}	
+
+
+	$saltBox = findObject("Salt", $response);
+	if ($saltBox == NULL)
+	{	
+		$saltBox = findObject("SALT", $response);
+	}
+	$yRow = getMedianY($saltBox);
+	$nutrient = "Salt ";
+
+	$jsonReturn->Salt = getResult($response,$xColumn, $yRow, $nutrient);
+	
+	getResult($response,$xColumn, $yRow, $nutrient);
+	
+	echo("\n");
+	echo("\n");
+	
+
+	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
+		$jsonReturn->Salt = getResult($response,$xColumn, $yRow, $nutrient);
+	}
+
+	return json_encode($jsonReturn);
+
+}
+
+
+/*
+	Second Method
+*/
+
+/*
+*Second Read Label Method getNewBoxCoord()*
+
+Works on the assumption that the food label has a consistent layout ie its always in the order of Energy, Fat .... Salt
+
+Finds the "100g" box
+Extracts the co-ordinates and creates a larger box
+The program then checks the co-ordinates of the rest of the objects in the JSON to determine if they're inside the larger box
+
+Hugely dependant on the quality of the JSON returned from the OCR
+Returns better output vs orginal for hamsambo.jpg 
+Returns correct values for noodles.jpg
+Returns correct values for pisachio.jpg- need to work on tolerances
+
+Param: OCRResponse
+Returns: JSON Output
+Dependancies: findObject(), getNewBoxCoord(), collidesWideBox().
+
+*/
+
+function secondSearch($response)
+{
+	$gram100Box = findObject("100g", $response);
+	$JSONreturn = new stdClass();
+	if ($gram100Box == NULL)
+	{
+		$gram100Box = findObject("100ml", $response);
+	}
+
+	$array = getNewBoxCoord($gram100Box);
+	$minXCoord = $array[0]; 
+	$maxXCoord = $array[1]; 
+	$maxYCoord = $array[2]; 
+	$minYCoord = $array[3]; 
+	$nutrientArray = array("Energy", "Fat", "saturates", "Carbohydrate", "sugars", "Fibre", "Protein", "Salt");
+	$index = 0;
+
+	//$gram100Box = findObject("100g**", $response);
+
+
+	foreach($response->textAnnotations as $box)
+		{
+			
+			$secondReturn = collidesWideBox($box, $minXCoord, $maxXCoord, $maxYCoord, $minYCoord, $nutrient);
+			if ($secondReturn != NULL)
+			{
+											// Fills the output in JSON format
+				switch ($index)
+				{
+				case 0:
+						$JSONreturn->Energy = $secondReturn;
+						$index++;
+						break;
+				case 1:
+						$JSONreturn->Fat = $secondReturn;
+						$index++;
+						break;		
+				case 2:
+						$JSONreturn->SaturatedFat = $secondReturn;
+						$index++;
+						break;		
+				case 3:
+						$JSONreturn->Carbohydrate = $secondReturn;
+						$index++;
+						break;		
+				case 4:
+						$JSONreturn->WhichOfSugars = $secondReturn;
+						$index++;
+						break;		
+				case 5:
+						$JSONreturn->Fibre = $secondReturn;
+						$index++;
+						break;		
+				case 6:
+						$JSONreturn->Protein = $secondReturn;
+						$index++;
+						break;		
+				case 7:
+						$JSONreturn->Salt = $secondReturn;
+						$index++;
+						break;	
+								
+				}
+			}
+		}
+	return $JSONreturn;		
+
+}
+
+
 
 /*
 *Third Read Label Method boxSearch()*
@@ -52,6 +284,9 @@ Creates a box and extends the right most side
 Uses the new box and check co-ordinates of the rest of the objects in the JSON
 Returns the objects that lie inside the newly created box
 
+Param: OCRresponse
+Returns: JSON Output
+Additional Functions Used: findObject(), nutrientBox(), getResultRightSearch()
 */
 
 
@@ -59,7 +294,7 @@ Returns the objects that lie inside the newly created box
 function thirdSearch($response)
 {
 	$jsonReturn = new stdClass();
-<<<<<<< HEAD
+
 	//$gram100Box = findObject("100g", $response);
 	/*
 		Third Method
@@ -106,7 +341,7 @@ function thirdSearch($response)
 						$index++;
 						break;		
 				case 4:
-						$JSONreturn->WhichOfSugars = $secondReturn;
+						$JSONreturn->ofWhichSugars = $secondReturn;
 						$index++;
 						break;		
 				case 5:
@@ -116,6 +351,7 @@ function thirdSearch($response)
 				case 6:
 						$JSONreturn->Protein = $secondReturn;
 						$index++;
+						echo($secondReturn);
 						break;		
 				case 7:
 						$JSONreturn->Salt = $secondReturn;
@@ -126,244 +362,18 @@ function thirdSearch($response)
 		
 		}
 		return $JSONreturn;
-	//echo("\n");
-	//echo("\n");
+
 	}
 }	
-
-/*
-	Second Method
-*/
-
-/*
-*Second Read Label Method getNewBoxCoord()*
-
-Works on the assumption that the food label has a consistent layout ie its always in the order of Energy, Fat .... Salt
-
-Finds the "100g" box
-Extracts the co-ordinates and creates a larger box
-The program then checks the co-ordinates of the rest of the objects in the JSON to determine if they're inside the larger box
-
-Hugely dependant on the quality of the JSON returned from the OCR
-Returns better output vs orginal for hamsambo.jpg 
-Returns correct values for noodles.jpg
-Returns correct values for pisachio.jpg- need to work on tolerances
-
-*/
-
-function secondSearch($response)
-{
-	$gram100Box = findObject("100g", $response);
-	$JSONreturn = new stdClass();
-	if ($gram100Box == NULL)
-	{
-		$gram100Box = findObject("100ml", $response);
-	}
-
-	$array = getNewBoxCoord($gram100Box);
-	$minXCoord = $array[0]; 
-	$maxXCoord = $array[1]; 
-	$maxYCoord = $array[2]; 
-	$minYCoord = $array[3]; 
-	$nutrientArray = array("Energy", "Fat", "saturates", "Carbohydrate", "sugars", "Fibre", "Protein", "Salt");
-	$index = 0;
-=======
-	$gram100Box = findObject("100g**", $response);
->>>>>>> dd30d7be27a91460fea5e4efbb9e186d1f2432b7
-
-	foreach($response->textAnnotations as $box)
-		{
-			
-			$secondReturn = collidesWideBox($box, $minXCoord, $maxXCoord, $maxYCoord, $minYCoord, $nutrient);
-			if ($secondReturn != NULL)
-			{
-				
-				switch ($index)
-				{
-				case 0:
-						$JSONreturn->Energy = $secondReturn;
-						$index++;
-						break;
-				case 1:
-						$JSONreturn->Fat = $secondReturn;
-						$index++;
-						break;		
-				case 2:
-						$JSONreturn->SaturatedFat = $secondReturn;
-						$index++;
-						break;		
-				case 3:
-						$JSONreturn->Carbohydrate = $secondReturn;
-						$index++;
-						break;		
-				case 4:
-						$JSONreturn->WhichOfSugars = $secondReturn;
-						$index++;
-						break;		
-				case 5:
-						$JSONreturn->Fibre = $secondReturn;
-						$index++;
-						break;		
-				case 6:
-						$JSONreturn->Protein = $secondReturn;
-						$index++;
-						break;		
-				case 7:
-						$JSONreturn->Salt = $secondReturn;
-						$index++;
-						break;	
-								
-				}
-			}
-		}
-	return $JSONreturn;		
-	//echo("\n");
-	//echo("\n");
-}
-/*
-	First Method
-*/
-function firstSearch($response)
-{
-	$jsonReturn = new stdClass();
-	$gram100Box = findObject("100g", $response);
-	if ($gram100box == NULL)
-	{	
-		$gram100box = findObject("100ml", $response);
-	}
-	$xColumn = getMedianX($gram100Box);
-<<<<<<< HEAD
-	//$jsonReturn->Fat = getResult($response,$xColumn, $yRow, $nutrient);
-	
-	$energyBox = findObject("ENERGY", $response);
-	//if ($energyBox == NULL)
-	//{	
-	//	$gram100box = findObject("Energy", $response);
-	//}
-	$yRow = getMedianY($energyBox);
-	$nutrient = "ENERGY ";
-	$jsonReturn->Energy= getResult($response,$xColumn, $yRow, $nutrient);
-	
-		
-	$fatBox = findObject("FAT", $response);
-	//if ($fatBox == NULL)
-	//{	
-	//	$fatBox = findObject("Fat", $response);
-	//}
-	$yRow = getMedianY($fatBox);
-	$nutrient = "Fat ";
-	$jsonReturn->Fat= getResult($response,$xColumn, $yRow, $nutrient);
-	
-	$saturatesBox = findObject("saturates", $response);
-	$nutrient = "Of which saturates ";
-	$yRow = getMedianY($saturatesBox);
-	$jsonReturn->Saturates = getResult($response,$xColumn, $yRow, $nutrient);
-	
-	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient)))
-	{
-		$jsonReturn->Saturates = getResult($response,$xColumn, $yRow, $nutrient);
-	}
-	
-	
-	$carbBox = findObject("CARBOHYDRATE", $response);
-	if ($carbBox == NULL)
-	{	
-		$carbBox = findObject("Carbohydrate", $response);
-	}
-	$yRow = getMedianY($carbBox);
-	$nutrient = "Carbohydarates ";
-	$jsonReturn->Carbohydrates = getResult($response,$xColumn, $yRow, $nutrient);
-	
-=======
-	$fatBox = findObject("Fat", $response);
-	$yRow = getMedianY($fatBox);
-	$nutrient = "Fat ";
-	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
-		$jsonReturn->Fat = getResult($response,$xColumn, $yRow, $nutrient);
-	}
-
-	$saturatesBox = findObject("saturates", $response);
-	$nutrient = "Of which saturates ";
-	$yRow = getMedianY($saturatesBox);
-	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
-		$jsonReturn->Saturates = getResult($response,$xColumn, $yRow, $nutrient);
-	}
-
-	$carbBox = findObject("Carbohydrate", $response);
-	$yRow = getMedianY($carbBox);
-	$nutrient = "Carbohydrates ";
-	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
-		$jsonReturn->Carbohydrates = getResult($response,$xColumn, $yRow, $nutrient);
-	}
-
->>>>>>> dd30d7be27a91460fea5e4efbb9e186d1f2432b7
-	$sugarsBox = findObject("sugars", $response);
-	$nutrient = "Of which sugars ";
-	$yRow = getMedianY($sugarsBox);
-	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){	
-		$jsonReturn->Sugars = getResult($response,$xColumn, $yRow, $nutrient);
-	}
-
-	
-	$fibreBox = findObject("Fibre", $response);
-	if ($fibreBox == NULL)
-	{	
-		$fibreBox = findObject("FIBRE", $response);
-	}
-	$yRow = getMedianY($fibreBox);
-	$nutrient = "Fibre ";
-<<<<<<< HEAD
-	$jsonReturn->Fibre = getResult($response,$xColumn, $yRow, $nutrient);
-	
-=======
-	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
-		$jsonReturn->Fibre = getResult($response,$xColumn, $yRow, $nutrient);
-	}
-
->>>>>>> dd30d7be27a91460fea5e4efbb9e186d1f2432b7
-	$proteinBox = findObject("Protein", $response);
-	if ($proteinBox == NULL)
-	{	
-		$gram100box = findObject("PROTEIN", $response);
-	}
-	$yRow = getMedianY($proteinBox);
-	$nutrient = "Protein ";
-<<<<<<< HEAD
-	$jsonReturn->Protein = getResult($response,$xColumn, $yRow, $nutrient);
-	
-=======
-	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
-		$jsonReturn->Protein = getResult($response,$xColumn, $yRow, $nutrient);
-	}	
-
->>>>>>> dd30d7be27a91460fea5e4efbb9e186d1f2432b7
-	$saltBox = findObject("Salt", $response);
-	if ($saltBox == NULL)
-	{	
-		$saltBox = findObject("SALT", $response);
-	}
-	$yRow = getMedianY($saltBox);
-	$nutrient = "Salt ";
-<<<<<<< HEAD
-	$jsonReturn->Salt = getResult($response,$xColumn, $yRow, $nutrient);
-	
-	getResult($response,$xColumn, $yRow, $nutrient);
-	
-	echo("\n");
-	echo("\n");
-	return $jsonReturn;
-=======
-	if (determineValue(getResult($response,$xColumn, $yRow, $nutrient))){
-		$jsonReturn->Salt = getResult($response,$xColumn, $yRow, $nutrient);
-	}
-
-	return json_encode($jsonReturn);
->>>>>>> dd30d7be27a91460fea5e4efbb9e186d1f2432b7
-}
 
 // Echo result of collides to console
 // TODO; add results into an array or JSON then print
 // First search method
+/*
+	Param: OCRresponse, Nutrient Name, co-ordiantes for collides method
+	Returns: Description of box if inside co-ordiantes
+
+*/
 function getResult($response, $xColumn, $yRow, $nutirent)	
 {
 	foreach ($response->textAnnotations as $box)
@@ -373,59 +383,47 @@ function getResult($response, $xColumn, $yRow, $nutirent)
 				if(collides($box, $xColumn, $yRow))
 				{
 					return $box->description;
-					//echo($nutirent);
-					//echo($box->description);
-					//echo("\n");
 				}
 			}
 	}
-	$topLeft = $object->boundingPoly->vertices[0]->x;
-	echo($topLeft);
-
 }
 
-<<<<<<< HEAD
+
 /*
 	Second Search Method
-	Return results of 2nd search method
+	Parameters: OCRresponse, Co-ordinates of new box, nutrient name
+	Returns: Description of box
 */
 
 function getResult100gWideBox($response, $minXCoord, $maxXCoord, $maxYCoord, $minYCoord, $nutrient)	
 {
 	if(collidesWideBox($box, $minXCoord, $maxXCoord, $maxYCoord, $minYCoord, $nutrient))
 	{
-		//echo($nutirent);
 		return ($box->description);
-		//echo("\n");
 	}
 	
 }
 /*
 	Third Search Method
-	Return results on third search method and prints them
+	Parameters: OCRresponse, Co-ordinates of new box, nutrient name
+	Return results on third search
 */
 function getResultRightSearch($box, $maxYValue, $minYValue, $xValueRight, $xValueLeft, $nutrient)	
 {
 	if(nutrientValue($box, $maxYValue, $minYValue, $xValueRight, $xValueLeft, $nutrient))
 	{
-		//echo($nutirent);
-		//echo($box->description);
-		//echo(" ");
 		return $box->description;
 	}
-	
 }
 
 /*
 	First Search Method
 	Return results on first search method and prints them
 */
+
 function collides($box, $xVal, $yVal)
 {
-=======
-function collides($box, $xVal, $yVal)
-{
->>>>>>> dd30d7be27a91460fea5e4efbb9e186d1f2432b7
+
 	$verts = $box->boundingPoly->vertices;
 	
 	if ($xVal > min($verts[0]->x, $verts[3]->x) && 
@@ -448,12 +446,9 @@ function getMedianX($object)
 
 	if ($ver != NULL)
 	{
-
-	foreach ($ver as $vertice)
+		foreach ($ver as $vertice)
 		{
-			# code...
 			$xRunningTotal += $vertice->x;
-
 		}
 	}
 	return $xRunningTotal/4;
@@ -481,20 +476,21 @@ function findObject($string, $response)
 {
 	foreach($response->textAnnotations as $text)
 	{
-<<<<<<< HEAD
-		if (strcasecmp($text->description, $string) ==0 || checkSimilarity($test->description)==$string)
-=======
+
+		
 		if ($text->description == $string || checkSimilarity($text->description)==$string)
->>>>>>> dd30d7be27a91460fea5e4efbb9e186d1f2432b7
+
 		{
 			return $text;
 		}
 	}
 }
 
-<<<<<<< HEAD
+
 /*
 	Second Search Method
+	Param: "Box" or object in OCRresponse
+	Returns: new box Co-ordinates
 */
 
 function getNewBoxCoord($box)
@@ -526,6 +522,8 @@ function getNewBoxCoord($box)
 
 /*
 	Second Search Method
+	Param: "Box" or object in OCRResponse, Co-ordinates of new box, Nutrient name
+	Returns: Description of object which is located inside the new box
 */
 function collidesWideBox($box, $minXCoord, $maxXCoord, $maxYCoord, $minYCoord, $nutrient)
 {
@@ -543,12 +541,14 @@ function collidesWideBox($box, $minXCoord, $maxXCoord, $maxYCoord, $minYCoord, $
 
 /*
 	Third Search Method
+	Param: "Box" or object in OCRResponse
+	Returns: Array of co-ordinates of new box
 */
 
 function nutrientBox($box)
 {
 
-	$verts = $box->boundingPoly->vertices;
+	$verts = $box->boundingPoly->vertices;			//Extracts all Co-ordinate values from box
 	$x0 = $verts[0]->x;
 	$y0 = $verts[0]->y;
 	$x1 = $verts[1]->x;
@@ -560,9 +560,9 @@ function nutrientBox($box)
 	
 
 	
-	$yLength = $y2-$y1;
-	$yTolerance = $yLength*1;
-	$y2 = $y2 + $yTolerance;
+	$yLength = $y2-$y1;								
+	$yTolerance = $yLength*1;						
+	$y2 = $y2 + $yTolerance;						
 	$y1 = $y1 - $yTolerance;
 	
 	$maxYValue = $y2;
@@ -579,6 +579,9 @@ function nutrientBox($box)
 
 /*
 	Third Search Method
+	Param: "Box" or object in OCRResponse, Co-ordinates of new box, Nutrient name
+	Returns: True, if "box" is inside the new box created
+			 False, if outside
 */
 
 function nutrientValue($box, $maxYValue, $minYValue, $xValueRight, $xValueLeft, $nutrient)
@@ -595,6 +598,5 @@ function nutrientValue($box, $maxYValue, $minYValue, $xValueRight, $xValueLeft, 
 	}
 	return false;
 }
-=======
->>>>>>> dd30d7be27a91460fea5e4efbb9e186d1f2432b7
+
 ?>
