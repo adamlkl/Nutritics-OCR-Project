@@ -21,4 +21,6 @@ Set the environment variables `GOOGLE_PROJECT_ID` and `GOOGLE_APPLICATION_CREDEN
 
 `docker-compose down`
 
-<a href="">
+<br />For more Information:
+
+<a href="https://github.com/adamlkl/Nutritics-OCR-Project/blob/master/PPreport%20.pdf">Project Report</a>
